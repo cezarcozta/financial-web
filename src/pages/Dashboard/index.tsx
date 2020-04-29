@@ -45,6 +45,20 @@ const Dashboard: React.FC = () => {
     loadTransactions();
   }, []);
 
+  async function handleDeleteTransaction(id: string): Promise<void> {
+    try {
+      await api.delete(`/transactions/${id}`);
+      setTransactions(
+        transactions.filter(transaction => transaction.id !== id),
+      );
+      await api.get('/transactions').then(response => {
+        setBalance(response.data.balance);
+      });
+    } catch (error) {
+      alert('Erro ao deletar transação, tente novamente');
+    }
+  }
+
   return (
     <>
       <Header />
@@ -87,6 +101,7 @@ const Dashboard: React.FC = () => {
                 <th>Preço</th>
                 <th>Categoria</th>
                 <th>Data</th>
+                <th>Excluir</th>
               </tr>
             </thead>
 
@@ -105,6 +120,14 @@ const Dashboard: React.FC = () => {
                       : '.  .  .'}
                   </td>
                   <td>{formatDate(transaction.created_at)}</td>
+                  <td>
+                    <button
+                      type="submit"
+                      onClick={() => handleDeleteTransaction(transaction.id)}
+                    >
+                      Remover
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
